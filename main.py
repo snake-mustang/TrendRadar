@@ -1740,12 +1740,13 @@ def format_title_for_platform(
         else:
             formatted_title = cleaned_title
 
-        title_prefix = "🆕 " if title_data.get("is_new") else ""
+        # 企业微信格式：不显示新增标记
+        title_prefix = ""
 
         if show_source:
-            result = f"[{title_data['source_name']}] {title_prefix}{formatted_title}"
+            result = f"[{title_data['source_name']}] {formatted_title}"
         else:
-            result = f"{title_prefix}{formatted_title}"
+            result = f"{formatted_title}"
 
         if rank_display:
             result += f" {rank_display}"
@@ -3130,7 +3131,7 @@ def split_content_into_batches(
     stats_header = ""
     if report_data["stats"]:
         if format_type == "wework":
-            stats_header = f"📊 **热点词汇统计**\n\n"
+            stats_header = f"**热点词汇统计**\n\n"
         elif format_type == "telegram":
             stats_header = f"📊 热点词汇统计\n\n"
         elif format_type == "ntfy":
@@ -3155,8 +3156,8 @@ def split_content_into_batches(
         else:
             mode_text = "暂无匹配的热点词汇"
 
-        # ntfy 格式：移除 emoji
-        if format_type == "ntfy":
+        # ntfy 和企业微信格式：移除 emoji
+        if format_type in ("ntfy", "wework"):
             simple_content = f"{mode_text}\n\n"
         else:
             simple_content = f"📭 {mode_text}\n\n"
@@ -3192,16 +3193,13 @@ def split_content_into_batches(
             # 构建词组标题
             word_header = ""
             if format_type == "wework":
+                # 企业微信格式：移除 emoji 图标
                 if count >= 10:
-                    word_header = (
-                        f"🔥 {sequence_display} **{word}** : **{count}** 条\n\n"
-                    )
+                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
                 elif count >= 5:
-                    word_header = (
-                        f"📈 {sequence_display} **{word}** : **{count}** 条\n\n"
-                    )
+                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
                 else:
-                    word_header = f"📌 {sequence_display} **{word}** : {count} 条\n\n"
+                    word_header = f"{sequence_display} **{word}** : {count} 条\n\n"
             elif format_type == "telegram":
                 if count >= 10:
                     word_header = f"🔥 {sequence_display} {word} : {count} 条\n\n"
@@ -3263,8 +3261,8 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{first_title_data['title']}"
 
-                # ntfy 格式：第一条新闻后也增加换行
-                if format_type == "ntfy":
+                # ntfy 和企业微信格式：第一条新闻后也增加换行
+                if format_type in ("ntfy", "wework"):
                     first_news_line = f"  1. {formatted_title}\n\n"
                 else:
                     first_news_line = f"  1. {formatted_title}\n"
@@ -3316,8 +3314,8 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{title_data['title']}"
 
-                # ntfy 格式：每条新闻后增加换行
-                if format_type == "ntfy":
+                # ntfy 和企业微信格式：每条新闻后增加换行
+                if format_type in ("ntfy", "wework"):
                     news_line = f"  {j + 1}. {formatted_title}\n\n"
                 else:
                     news_line = f"  {j + 1}. {formatted_title}\n"
@@ -3362,7 +3360,7 @@ def split_content_into_batches(
     if report_data["new_titles"]:
         new_header = ""
         if format_type == "wework":
-            new_header = f"\n\n\n\n🆕 **本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            new_header = f"\n\n\n\n**本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
         elif format_type == "telegram":
             new_header = (
                 f"\n\n🆕 本次新增热点新闻 (共 {report_data['total_new_count']} 条)\n\n"
@@ -3433,8 +3431,8 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{title_data_copy['title']}"
 
-                # ntfy 格式：新增新闻第一条也要增加换行
-                if format_type == "ntfy":
+                # ntfy 和企业微信格式：新增新闻第一条也要增加换行
+                if format_type in ("ntfy", "wework"):
                     first_news_line = f"  1. {formatted_title}\n\n"
                 else:
                     first_news_line = f"  1. {formatted_title}\n"
@@ -3486,8 +3484,8 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{title_data_copy['title']}"
 
-                # ntfy 格式：新增新闻剩余条目也要增加换行
-                if format_type == "ntfy":
+                # ntfy 和企业微信格式：新增新闻剩余条目也要增加换行
+                if format_type in ("ntfy", "wework"):
                     news_line = f"  {j + 1}. {formatted_title}\n\n"
                 else:
                     news_line = f"  {j + 1}. {formatted_title}\n"
@@ -3510,7 +3508,7 @@ def split_content_into_batches(
     if report_data["failed_ids"]:
         failed_header = ""
         if format_type == "wework":
-            failed_header = f"\n\n\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n\n\n\n**数据获取失败的平台：**\n\n"
         elif format_type == "telegram":
             failed_header = f"\n\n⚠️ 数据获取失败的平台：\n\n"
         elif format_type == "ntfy":
