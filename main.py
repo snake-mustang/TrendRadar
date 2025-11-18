@@ -1,5 +1,6 @@
 # 在文件顶部添加必要的导入
 from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Optional, Union
 import pytz
 
 # ... 其他已有代码保持不变 ...
