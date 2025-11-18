@@ -1,3 +1,239 @@
+# 在文件顶部添加必要的导入
+from datetime import datetime, timedelta
+import pytz
+
+# ... 其他已有代码保持不变 ...
+
+# === 报告生成 ===
+def generate_report_text(news_list: list) -> str:
+    """生成报告文本，格式优化"""
+    # 添加标题
+    report = "《最新AI资讯 · 技术中心》\n\n"
+    
+    # 总新闻数统计
+    report += f"总新闻数: {len(news_list)}\n\n"
+    
+    # 热点词汇统计（简化版）
+    report += "热点词汇统计\n"
+    # ... 原有的词汇统计逻辑 ...
+    report += "AI 人工智能 机器学习 深度学习 大模型 生成式AI LLM 自然语言处理 计算机视觉 神经网络\n\n"
+    
+    # 新闻列表（每条换行显示）
+    for idx, news in enumerate(news_list, 1):
+        # 获取新闻信息
+        source = news.get('source_name', '未知来源')
+        title = news.get('title', '无标题')
+        ranks = news.get('ranks', [])
+        count = news.get('count', 1)
+        first_time = news.get('first_time', '')
+        last_time = news.get('last_time', '')
+        
+        # 格式化时间信息
+        time_info = ""
+        if first_time and last_time and first_time != last_time:
+            time_info = f"时间段: {first_time} ~ {last_time}"
+        elif first_time:
+            time_info = f"时间: {first_time}"
+        
+        # 格式化排名
+        rank_str = ""
+        if ranks:
+            min_rank = min(ranks)
+            max_rank = max(ranks)
+            if min_rank == max_rank:
+                rank_str = f"[{min_rank}]"
+            else:
+                rank_str = f"[{min_rank}-{max_rank}]"
+        
+        # 添加新闻条目
+        report += f"{idx}. [{source}]\n"
+        report += f"   标题: {title}\n"
+        if rank_str:
+            report += f"   排名: {rank_str}\n"
+        if time_info:
+            report += f"   {time_info}\n"
+        report += f"   出现次数: {count}次\n\n"
+    
+    # 更新时间
+    beijing_time = get_beijing_time().strftime('%Y-%m-%d %H:%M:%S')
+    report += f"更新时间: {beijing_time}"
+    
+    return report
+
+# 修改 HTML 报告生成函数
+def generate_html_report(news_list: list) -> str:
+    """生成HTML格式的报告"""
+    beijing_time = get_beijing_time().strftime('%Y-%m-%d %H:%M:%S')
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>最新AI资讯 · 技术中心</title>
+        <style>
+            body {{ 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                line-height: 1.6; 
+                color: #333; 
+                max-width: 800px; 
+                margin: 0 auto; 
+                padding: 20px; 
+                background-color: #f9f9f9;
+            }}
+            .header {{ 
+                text-align: center; 
+                margin-bottom: 30px; 
+                padding-bottom: 15px; 
+                border-bottom: 2px solid #4a90e2;
+            }}
+            .header h1 {{ 
+                color: #2c3e50; 
+                font-size: 28px; 
+                margin-bottom: 5px;
+            }}
+            .stats {{ 
+                background-color: #e8f4ff; 
+                padding: 15px; 
+                border-radius: 5px; 
+                margin-bottom: 20px;
+                font-size: 16px;
+            }}
+            .news-item {{ 
+                background-color: white; 
+                padding: 15px; 
+                margin-bottom: 15px; 
+                border-radius: 5px; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-left: 3px solid #4a90e2;
+            }}
+            .news-source {{ 
+                font-weight: bold; 
+                color: #2c3e50; 
+                margin-bottom: 5px;
+            }}
+            .news-title {{ 
+                font-size: 16px; 
+                margin: 8px 0;
+            }}
+            .news-meta {{ 
+                color: #7f8c8d; 
+                font-size: 14px; 
+                margin-top: 5px;
+            }}
+            .footer {{ 
+                text-align: center; 
+                margin-top: 30px; 
+                color: #7f8c8d; 
+                font-size: 14px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>最新AI资讯 · 技术中心</h1>
+        </div>
+        
+        <div class="stats">
+            <p>总新闻数: {len(news_list)}</p>
+            <p>热点词汇: AI, 人工智能, 机器学习, 深度学习, 大模型, 生成式AI, LLM, 自然语言处理, 计算机视觉, 神经网络</p>
+        </div>
+    """
+    
+    for news in news_list:
+        source = html_escape(news.get('source_name', '未知来源'))
+        title = html_escape(news.get('title', '无标题'))
+        ranks = news.get('ranks', [])
+        count = news.get('count', 1)
+        first_time = news.get('first_time', '')
+        last_time = news.get('last_time', '')
+        
+        # 格式化时间信息
+        time_info = ""
+        if first_time and last_time and first_time != last_time:
+            time_info = f"时间段: {first_time} ~ {last_time}"
+        elif first_time:
+            time_info = f"时间: {first_time}"
+        
+        # 格式化排名
+        rank_str = ""
+        if ranks:
+            min_rank = min(ranks)
+            max_rank = max(ranks)
+            if min_rank == max_rank:
+                rank_str = f"排名: {min_rank}"
+            else:
+                rank_str = f"排名: {min_rank}-{max_rank}"
+        
+        html_content += f"""
+        <div class="news-item">
+            <div class="news-source">[{source}]</div>
+            <div class="news-title">{title}</div>
+            <div class="news-meta">
+                {rank_str}
+                <br>{time_info}
+                <br>出现次数: {count}次
+            </div>
+        </div>
+        """
+    
+    html_content += f"""
+        <div class="footer">
+            <p>更新时间: {beijing_time}</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html_content
+
+# 在 NotificationSender 类中修改 generate_report 方法
+class NotificationSender:
+    # ... 其他方法保持不变 ...
+    
+    def generate_report(
+        self, 
+        word_stats: Dict, 
+        report_mode: str, 
+        new_titles: Optional[Dict] = None
+    ) -> Tuple[str, str]:
+        """生成报告文本和HTML"""
+        # 获取AI相关的新闻组
+        ai_group = None
+        for group_key, group_data in word_stats.items():
+            if "AI" in group_key or "人工智能" in group_key:
+                ai_group = group_data
+                break
+        
+        if not ai_group:
+            # 如果没有找到AI组，使用第一个组
+            first_key = next(iter(word_stats.keys()))
+            ai_group = word_stats[first_key]
+        
+        # 获取AI新闻列表
+        all_news = []
+        for source_id, news_list in ai_group["titles"].items():
+            all_news.extend(news_list)
+        
+        # 按权重排序
+        all_news_sorted = sorted(
+            all_news,
+            key=lambda news: self.calculate_news_weight(news),
+            reverse=True
+        )
+        
+        # 生成报告文本
+        text_report = generate_report_text(all_news_sorted)
+        html_report = generate_html_report(all_news_sorted)
+        
+        return text_report, html_report
+
+
+
+
+
+
+
 # coding=utf-8
 
 import json
