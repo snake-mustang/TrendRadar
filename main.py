@@ -1563,11 +1563,14 @@ def count_word_frequency(
             ),
         )
 
+        # 🔥 限制每个词组最多显示 10 条新闻
+        top_titles = sorted_titles[:10]
+
         stats.append(
             {
                 "word": group_key,
                 "count": data["count"],
-                "titles": sorted_titles,
+                "titles": top_titles,
                 "percentage": (
                     round(data["count"] / total_titles * 100, 2)
                     if total_titles > 0
@@ -3093,7 +3096,7 @@ def split_content_into_batches(
 
     base_header = ""
     if format_type == "wework":
-        base_header = f"**总新闻数：** {total_titles}\n\n\n\n"
+        base_header = f"《最新AI资讯 · 技术中心》\n\n"
     elif format_type == "telegram":
         base_header = f"总新闻数： {total_titles}\n\n"
     elif format_type == "ntfy":
@@ -3131,7 +3134,7 @@ def split_content_into_batches(
     stats_header = ""
     if report_data["stats"]:
         if format_type == "wework":
-            stats_header = f"**热点词汇统计**\n\n"
+            stats_header = ""  # 企业微信：不显示二级标题，保持简洁
         elif format_type == "telegram":
             stats_header = f"📊 热点词汇统计\n\n"
         elif format_type == "ntfy":
@@ -3193,13 +3196,13 @@ def split_content_into_batches(
             # 构建词组标题
             word_header = ""
             if format_type == "wework":
-                # 企业微信格式：移除 emoji 图标
+                # 企业微信格式：移除 emoji 图标和序号，只显示词组和数量
                 if count >= 10:
-                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
+                    word_header = f"**{word}** : **{count}** 条\n\n"
                 elif count >= 5:
-                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
+                    word_header = f"**{word}** : **{count}** 条\n\n"
                 else:
-                    word_header = f"{sequence_display} **{word}** : {count} 条\n\n"
+                    word_header = f"**{word}** : {count} 条\n\n"
             elif format_type == "telegram":
                 if count >= 10:
                     word_header = f"🔥 {sequence_display} {word} : {count} 条\n\n"
@@ -3360,7 +3363,7 @@ def split_content_into_batches(
     if report_data["new_titles"]:
         new_header = ""
         if format_type == "wework":
-            new_header = f"\n\n\n\n**本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            new_header = f"\n\n\n\n"  # 企业微信：只保留分隔，不显示标题
         elif format_type == "telegram":
             new_header = (
                 f"\n\n🆕 本次新增热点新闻 (共 {report_data['total_new_count']} 条)\n\n"
@@ -3879,10 +3882,10 @@ def send_to_wework(
             f"发送企业微信第 {i}/{len(batches)} 批次，大小：{batch_size} 字节 [{report_type}]"
         )
 
-        # 添加批次标识
-        if len(batches) > 1:
-            batch_header = f"**[第 {i}/{len(batches)} 批次]**\n\n"
-            batch_content = batch_header + batch_content
+        # 企业微信：不添加批次标识，保持简洁
+        # if len(batches) > 1:
+        #     batch_header = f"**[第 {i}/{len(batches)} 批次]**\n\n"
+        #     batch_content = batch_header + batch_content
 
         payload = {"msgtype": "markdown", "markdown": {"content": batch_content}}
 

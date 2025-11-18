@@ -77,9 +77,7 @@ weight:
 
 # name 可以定义任意名称，只具有显示作用，即使项目运行了几天后，忽然改掉 name 也不会影响代码的正常运行
 platforms:
-  # === 国内技术社区 ===
-  - id: "csdn"
-    name: "CSDN"
+  # === 核心技术平台（仅保留4个） ===
   - id: "juejin"
     name: "稀土掘金"
   - id: "51cto"
@@ -90,8 +88,7 @@ platforms:
     name: "思否"
   - id: "v2ex"
     name: "V2EX"
-  
-  # === 国际技术社区 ===
+      # === 国际技术社区 ===
   - id: "github-trending"
     name: "GitHub Trending"
   - id: "hacknews"
@@ -100,21 +97,7 @@ platforms:
     name: "Reddit ML"
   - id: "producthunt"
     name: "Product Hunt"
-  
-  # === 综合资讯平台（保留部分） ===
-  - id: "zhihu"
-    name: "知乎"
-  - id: "wallstreetcn-hot"
-    name: "华尔街见闻"
-  - id: "cls-hot"
-    name: "财联社热门"
   - id: "36kr"
     name: "36氪"
-  - id: "thepaper"
-    name: "澎湃新闻"
   - id: "ithome"
     name: "IT之家"
-  
-  # === 视频平台（可选） ===
-  - id: "bilibili-hot-search"
-    name: "bilibili 热搜"
