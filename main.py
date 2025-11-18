@@ -4,37 +4,38 @@ import pytz
 
 # ... 其他已有代码保持不变 ...
 
+
 # === 报告生成 ===
 def generate_report_text(news_list: list) -> str:
     """生成报告文本，格式优化"""
     # 添加标题
     report = "《最新AI资讯 · 技术中心》\n\n"
-    
+
     # 总新闻数统计
     report += f"总新闻数: {len(news_list)}\n\n"
-    
+
     # 热点词汇统计（简化版）
     report += "热点词汇统计\n"
     # ... 原有的词汇统计逻辑 ...
     report += "AI 人工智能 机器学习 深度学习 大模型 生成式AI LLM 自然语言处理 计算机视觉 神经网络\n\n"
-    
+
     # 新闻列表（每条换行显示）
     for idx, news in enumerate(news_list, 1):
         # 获取新闻信息
-        source = news.get('source_name', '未知来源')
-        title = news.get('title', '无标题')
-        ranks = news.get('ranks', [])
-        count = news.get('count', 1)
-        first_time = news.get('first_time', '')
-        last_time = news.get('last_time', '')
-        
+        source = news.get("source_name", "未知来源")
+        title = news.get("title", "无标题")
+        ranks = news.get("ranks", [])
+        count = news.get("count", 1)
+        first_time = news.get("first_time", "")
+        last_time = news.get("last_time", "")
+
         # 格式化时间信息
         time_info = ""
         if first_time and last_time and first_time != last_time:
             time_info = f"时间段: {first_time} ~ {last_time}"
         elif first_time:
             time_info = f"时间: {first_time}"
-        
+
         # 格式化排名
         rank_str = ""
         if ranks:
@@ -44,7 +45,7 @@ def generate_report_text(news_list: list) -> str:
                 rank_str = f"[{min_rank}]"
             else:
                 rank_str = f"[{min_rank}-{max_rank}]"
-        
+
         # 添加新闻条目
         report += f"{idx}. [{source}]\n"
         report += f"   标题: {title}\n"
@@ -53,18 +54,19 @@ def generate_report_text(news_list: list) -> str:
         if time_info:
             report += f"   {time_info}\n"
         report += f"   出现次数: {count}次\n\n"
-    
+
     # 更新时间
-    beijing_time = get_beijing_time().strftime('%Y-%m-%d %H:%M:%S')
+    beijing_time = get_beijing_time().strftime("%Y-%m-%d %H:%M:%S")
     report += f"更新时间: {beijing_time}"
-    
+
     return report
+
 
 # 修改 HTML 报告生成函数
 def generate_html_report(news_list: list) -> str:
     """生成HTML格式的报告"""
-    beijing_time = get_beijing_time().strftime('%Y-%m-%d %H:%M:%S')
-    
+    beijing_time = get_beijing_time().strftime("%Y-%m-%d %H:%M:%S")
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -139,22 +141,22 @@ def generate_html_report(news_list: list) -> str:
             <p>热点词汇: AI, 人工智能, 机器学习, 深度学习, 大模型, 生成式AI, LLM, 自然语言处理, 计算机视觉, 神经网络</p>
         </div>
     """
-    
+
     for news in news_list:
-        source = html_escape(news.get('source_name', '未知来源'))
-        title = html_escape(news.get('title', '无标题'))
-        ranks = news.get('ranks', [])
-        count = news.get('count', 1)
-        first_time = news.get('first_time', '')
-        last_time = news.get('last_time', '')
-        
+        source = html_escape(news.get("source_name", "未知来源"))
+        title = html_escape(news.get("title", "无标题"))
+        ranks = news.get("ranks", [])
+        count = news.get("count", 1)
+        first_time = news.get("first_time", "")
+        last_time = news.get("last_time", "")
+
         # 格式化时间信息
         time_info = ""
         if first_time and last_time and first_time != last_time:
             time_info = f"时间段: {first_time} ~ {last_time}"
         elif first_time:
             time_info = f"时间: {first_time}"
-        
+
         # 格式化排名
         rank_str = ""
         if ranks:
@@ -164,7 +166,7 @@ def generate_html_report(news_list: list) -> str:
                 rank_str = f"排名: {min_rank}"
             else:
                 rank_str = f"排名: {min_rank}-{max_rank}"
-        
+
         html_content += f"""
         <div class="news-item">
             <div class="news-source">[{source}]</div>
@@ -176,7 +178,7 @@ def generate_html_report(news_list: list) -> str:
             </div>
         </div>
         """
-    
+
     html_content += f"""
         <div class="footer">
             <p>更新时间: {beijing_time}</p>
@@ -184,18 +186,16 @@ def generate_html_report(news_list: list) -> str:
     </body>
     </html>
     """
-    
+
     return html_content
+
 
 # 在 NotificationSender 类中修改 generate_report 方法
 class NotificationSender:
     # ... 其他方法保持不变 ...
-    
+
     def generate_report(
-        self, 
-        word_stats: Dict, 
-        report_mode: str, 
-        new_titles: Optional[Dict] = None
+        self, word_stats: Dict, report_mode: str, new_titles: Optional[Dict] = None
     ) -> Tuple[str, str]:
         """生成报告文本和HTML"""
         # 获取AI相关的新闻组
@@ -204,34 +204,27 @@ class NotificationSender:
             if "AI" in group_key or "人工智能" in group_key:
                 ai_group = group_data
                 break
-        
+
         if not ai_group:
             # 如果没有找到AI组，使用第一个组
             first_key = next(iter(word_stats.keys()))
             ai_group = word_stats[first_key]
-        
+
         # 获取AI新闻列表
         all_news = []
         for source_id, news_list in ai_group["titles"].items():
             all_news.extend(news_list)
-        
+
         # 按权重排序
         all_news_sorted = sorted(
-            all_news,
-            key=lambda news: self.calculate_news_weight(news),
-            reverse=True
+            all_news, key=lambda news: self.calculate_news_weight(news), reverse=True
         )
-        
+
         # 生成报告文本
         text_report = generate_report_text(all_news_sorted)
         html_report = generate_html_report(all_news_sorted)
-        
+
         return text_report, html_report
-
-
-
-
-
 
 
 # coding=utf-8
@@ -310,30 +303,36 @@ def load_config():
         "RANK_THRESHOLD": config_data["report"]["rank_threshold"],
         "USE_PROXY": config_data["crawler"]["use_proxy"],
         "DEFAULT_PROXY": config_data["crawler"]["default_proxy"],
-        "ENABLE_CRAWLER": os.environ.get("ENABLE_CRAWLER", "").strip().lower()
-        in ("true", "1")
-        if os.environ.get("ENABLE_CRAWLER", "").strip()
-        else config_data["crawler"]["enable_crawler"],
-        "ENABLE_NOTIFICATION": os.environ.get("ENABLE_NOTIFICATION", "").strip().lower()
-        in ("true", "1")
-        if os.environ.get("ENABLE_NOTIFICATION", "").strip()
-        else config_data["notification"]["enable_notification"],
+        "ENABLE_CRAWLER": (
+            os.environ.get("ENABLE_CRAWLER", "").strip().lower() in ("true", "1")
+            if os.environ.get("ENABLE_CRAWLER", "").strip()
+            else config_data["crawler"]["enable_crawler"]
+        ),
+        "ENABLE_NOTIFICATION": (
+            os.environ.get("ENABLE_NOTIFICATION", "").strip().lower() in ("true", "1")
+            if os.environ.get("ENABLE_NOTIFICATION", "").strip()
+            else config_data["notification"]["enable_notification"]
+        ),
         "MESSAGE_BATCH_SIZE": config_data["notification"]["message_batch_size"],
         "DINGTALK_BATCH_SIZE": config_data["notification"].get(
             "dingtalk_batch_size", 20000
         ),
-        "FEISHU_BATCH_SIZE": config_data["notification"].get("feishu_batch_size", 29000),
+        "FEISHU_BATCH_SIZE": config_data["notification"].get(
+            "feishu_batch_size", 29000
+        ),
         "BATCH_SEND_INTERVAL": config_data["notification"]["batch_send_interval"],
         "FEISHU_MESSAGE_SEPARATOR": config_data["notification"][
             "feishu_message_separator"
         ],
         "PUSH_WINDOW": {
-            "ENABLED": os.environ.get("PUSH_WINDOW_ENABLED", "").strip().lower()
-            in ("true", "1")
-            if os.environ.get("PUSH_WINDOW_ENABLED", "").strip()
-            else config_data["notification"]
-            .get("push_window", {})
-            .get("enabled", False),
+            "ENABLED": (
+                os.environ.get("PUSH_WINDOW_ENABLED", "").strip().lower()
+                in ("true", "1")
+                if os.environ.get("PUSH_WINDOW_ENABLED", "").strip()
+                else config_data["notification"]
+                .get("push_window", {})
+                .get("enabled", False)
+            ),
             "TIME_RANGE": {
                 "START": os.environ.get("PUSH_WINDOW_START", "").strip()
                 or config_data["notification"]
@@ -346,12 +345,14 @@ def load_config():
                 .get("time_range", {})
                 .get("end", "22:00"),
             },
-            "ONCE_PER_DAY": os.environ.get("PUSH_WINDOW_ONCE_PER_DAY", "").strip().lower()
-            in ("true", "1")
-            if os.environ.get("PUSH_WINDOW_ONCE_PER_DAY", "").strip()
-            else config_data["notification"]
-            .get("push_window", {})
-            .get("once_per_day", True),
+            "ONCE_PER_DAY": (
+                os.environ.get("PUSH_WINDOW_ONCE_PER_DAY", "").strip().lower()
+                in ("true", "1")
+                if os.environ.get("PUSH_WINDOW_ONCE_PER_DAY", "").strip()
+                else config_data["notification"]
+                .get("push_window", {})
+                .get("once_per_day", True)
+            ),
             "RECORD_RETENTION_DAYS": int(
                 os.environ.get("PUSH_WINDOW_RETENTION_DAYS", "").strip() or "0"
             )
@@ -635,34 +636,36 @@ class PushRecordManager:
         """检查当前时间是否在指定时间范围内"""
         now = get_beijing_time()
         current_time = now.strftime("%H:%M")
-    
+
         def normalize_time(time_str: str) -> str:
             """将时间字符串标准化为 HH:MM 格式"""
             try:
                 parts = time_str.strip().split(":")
                 if len(parts) != 2:
                     raise ValueError(f"时间格式错误: {time_str}")
-            
+
                 hour = int(parts[0])
                 minute = int(parts[1])
-            
+
                 if not (0 <= hour <= 23 and 0 <= minute <= 59):
                     raise ValueError(f"时间范围错误: {time_str}")
-            
+
                 return f"{hour:02d}:{minute:02d}"
             except Exception as e:
                 print(f"时间格式化错误 '{time_str}': {e}")
                 return time_str
-    
+
         normalized_start = normalize_time(start_time)
         normalized_end = normalize_time(end_time)
         normalized_current = normalize_time(current_time)
-    
+
         result = normalized_start <= normalized_current <= normalized_end
-    
+
         if not result:
-            print(f"时间窗口判断：当前 {normalized_current}，窗口 {normalized_start}-{normalized_end}")
-    
+            print(
+                f"时间窗口判断：当前 {normalized_current}，窗口 {normalized_start}-{normalized_end}"
+            )
+
         return result
 
 
@@ -1780,19 +1783,20 @@ def format_title_for_platform(
         else:
             formatted_title = cleaned_title
 
-        title_prefix = "🆕 " if title_data.get("is_new") else ""
+        # ntfy 格式：不显示新增标记
+        title_prefix = ""
 
         if show_source:
-            result = f"[{title_data['source_name']}] {title_prefix}{formatted_title}"
+            result = f"[{title_data['source_name']}] {formatted_title}"
         else:
-            result = f"{title_prefix}{formatted_title}"
+            result = f"{formatted_title}"
 
         if rank_display:
             result += f" {rank_display}"
         if title_data["time_display"]:
-            result += f" `- {title_data['time_display']}`"
+            result += f" - {title_data['time_display']}"
         if title_data["count"] > 1:
-            result += f" `({title_data['count']}次)`"
+            result += f" ({title_data['count']}次)"
 
         return result
 
@@ -3129,7 +3133,7 @@ def split_content_into_batches(
         elif format_type == "telegram":
             stats_header = f"📊 热点词汇统计\n\n"
         elif format_type == "ntfy":
-            stats_header = f"📊 **热点词汇统计**\n\n"
+            stats_header = f"**热点词汇统计**\n\n"
         elif format_type == "feishu":
             stats_header = f"📊 **热点词汇统计**\n\n"
         elif format_type == "dingtalk":
@@ -3149,7 +3153,13 @@ def split_content_into_batches(
             mode_text = "当前榜单模式下暂无匹配的热点词汇"
         else:
             mode_text = "暂无匹配的热点词汇"
-        simple_content = f"📭 {mode_text}\n\n"
+
+        # ntfy 格式：移除 emoji
+        if format_type == "ntfy":
+            simple_content = f"{mode_text}\n\n"
+        else:
+            simple_content = f"📭 {mode_text}\n\n"
+
         final_content = base_header + simple_content + base_footer
         batches.append(final_content)
         return batches
@@ -3199,16 +3209,13 @@ def split_content_into_batches(
                 else:
                     word_header = f"📌 {sequence_display} {word} : {count} 条\n\n"
             elif format_type == "ntfy":
+                # ntfy 格式：移除 emoji 图标
                 if count >= 10:
-                    word_header = (
-                        f"🔥 {sequence_display} **{word}** : **{count}** 条\n\n"
-                    )
+                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
                 elif count >= 5:
-                    word_header = (
-                        f"📈 {sequence_display} **{word}** : **{count}** 条\n\n"
-                    )
+                    word_header = f"{sequence_display} **{word}** : **{count}** 条\n\n"
                 else:
-                    word_header = f"📌 {sequence_display} **{word}** : {count} 条\n\n"
+                    word_header = f"{sequence_display} **{word}** : {count} 条\n\n"
             elif format_type == "feishu":
                 if count >= 10:
                     word_header = f"🔥 <font color='grey'>{sequence_display}</font> **{word}** : <font color='red'>{count}</font> 条\n\n"
@@ -3255,9 +3262,13 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{first_title_data['title']}"
 
-                first_news_line = f"  1. {formatted_title}\n"
-                if len(stat["titles"]) > 1:
-                    first_news_line += "\n"
+                # ntfy 格式：第一条新闻后也增加换行
+                if format_type == "ntfy":
+                    first_news_line = f"  1. {formatted_title}\n\n"
+                else:
+                    first_news_line = f"  1. {formatted_title}\n"
+                    if len(stat["titles"]) > 1:
+                        first_news_line += "\n"
 
             # 原子性检查：词组标题+第一条新闻必须一起处理
             word_with_first_news = word_header + first_news_line
@@ -3304,9 +3315,13 @@ def split_content_into_batches(
                 else:
                     formatted_title = f"{title_data['title']}"
 
-                news_line = f"  {j + 1}. {formatted_title}\n"
-                if j < len(stat["titles"]) - 1:
-                    news_line += "\n"
+                # ntfy 格式：每条新闻后增加换行
+                if format_type == "ntfy":
+                    news_line = f"  {j + 1}. {formatted_title}\n\n"
+                else:
+                    news_line = f"  {j + 1}. {formatted_title}\n"
+                    if j < len(stat["titles"]) - 1:
+                        news_line += "\n"
 
                 test_content = current_batch + news_line
                 if (
@@ -3352,7 +3367,9 @@ def split_content_into_batches(
                 f"\n\n🆕 本次新增热点新闻 (共 {report_data['total_new_count']} 条)\n\n"
             )
         elif format_type == "ntfy":
-            new_header = f"\n\n🆕 **本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            new_header = (
+                f"\n\n**本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
+            )
         elif format_type == "feishu":
             new_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n🆕 **本次新增热点新闻** (共 {report_data['total_new_count']} 条)\n\n"
         elif format_type == "dingtalk":
@@ -3408,10 +3425,18 @@ def split_content_into_batches(
                     formatted_title = format_title_for_platform(
                         "dingtalk", title_data_copy, show_source=False
                     )
+                elif format_type == "ntfy":
+                    formatted_title = format_title_for_platform(
+                        "ntfy", title_data_copy, show_source=False
+                    )
                 else:
                     formatted_title = f"{title_data_copy['title']}"
 
-                first_news_line = f"  1. {formatted_title}\n"
+                # ntfy 格式：新增新闻第一条也要增加换行
+                if format_type == "ntfy":
+                    first_news_line = f"  1. {formatted_title}\n\n"
+                else:
+                    first_news_line = f"  1. {formatted_title}\n"
 
             # 原子性检查：来源标题+第一条新闻
             source_with_first_news = source_header + first_news_line
@@ -3453,10 +3478,18 @@ def split_content_into_batches(
                     formatted_title = format_title_for_platform(
                         "dingtalk", title_data_copy, show_source=False
                     )
+                elif format_type == "ntfy":
+                    formatted_title = format_title_for_platform(
+                        "ntfy", title_data_copy, show_source=False
+                    )
                 else:
                     formatted_title = f"{title_data_copy['title']}"
 
-                news_line = f"  {j + 1}. {formatted_title}\n"
+                # ntfy 格式：新增新闻剩余条目也要增加换行
+                if format_type == "ntfy":
+                    news_line = f"  {j + 1}. {formatted_title}\n\n"
+                else:
+                    news_line = f"  {j + 1}. {formatted_title}\n"
 
                 test_content = current_batch + news_line
                 if (
@@ -3480,7 +3513,7 @@ def split_content_into_batches(
         elif format_type == "telegram":
             failed_header = f"\n\n⚠️ 数据获取失败的平台：\n\n"
         elif format_type == "ntfy":
-            failed_header = f"\n\n⚠️ **数据获取失败的平台：**\n\n"
+            failed_header = f"\n\n**数据获取失败的平台：**\n\n"
         elif format_type == "feishu":
             failed_header = f"\n{CONFIG['FEISHU_MESSAGE_SEPARATOR']}\n\n⚠️ **数据获取失败的平台：**\n\n"
         elif format_type == "dingtalk":
@@ -3720,7 +3753,9 @@ def send_to_feishu(
                     if i < len(batches):
                         time.sleep(CONFIG["BATCH_SEND_INTERVAL"])
                 else:
-                    error_msg = result.get("msg") or result.get("StatusMessage", "未知错误")
+                    error_msg = result.get("msg") or result.get(
+                        "StatusMessage", "未知错误"
+                    )
                     print(
                         f"飞书第 {i}/{len(batches)} 批次发送失败 [{report_type}]，错误：{error_msg}"
                     )
@@ -3982,7 +4017,7 @@ def send_to_email(
             if smtp_port == 465:
                 use_tls = False  # SSL 模式（SMTP_SSL）
             elif smtp_port == 587:
-                use_tls = True   # TLS 模式（STARTTLS）
+                use_tls = True  # TLS 模式（STARTTLS）
             else:
                 # 其他端口优先尝试 TLS（更安全，更广泛支持）
                 use_tls = True
@@ -4109,10 +4144,10 @@ def send_to_ntfy(
         "当日汇总": "Daily Summary",
         "当前榜单汇总": "Current Ranking",
         "增量更新": "Incremental Update",
-        "实时增量": "Realtime Incremental", 
-        "实时当前榜单": "Realtime Current Ranking",  
+        "实时增量": "Realtime Incremental",
+        "实时当前榜单": "Realtime Current Ranking",
     }
-    report_type_en = report_type_en_map.get(report_type, "News Report") 
+    report_type_en = report_type_en_map.get(report_type, "News Report")
 
     headers = {
         "Content-Type": "text/plain; charset=utf-8",
@@ -4124,7 +4159,7 @@ def send_to_ntfy(
 
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    
+
     # 构建完整URL，确保格式正确
     base_url = server_url.rstrip("/")
     if not base_url.startswith(("http://", "https://")):
@@ -4146,7 +4181,7 @@ def send_to_ntfy(
     # 反转批次顺序，使得在ntfy客户端显示时顺序正确
     # ntfy显示最新消息在上面，所以我们从最后一批开始推送
     reversed_batches = list(reversed(batches))
-    
+
     print(f"ntfy将按反向顺序推送（最后批次先推送），确保客户端显示顺序正确")
 
     # 逐批发送（反向顺序）
@@ -4154,7 +4189,7 @@ def send_to_ntfy(
     for idx, batch_content in enumerate(reversed_batches, 1):
         # 计算正确的批次编号（用户视角的编号）
         actual_batch_num = total_batches - idx + 1
-        
+
         batch_size = len(batch_content.encode("utf-8"))
         print(
             f"发送ntfy第 {actual_batch_num}/{total_batches} 批次（推送顺序: {idx}/{total_batches}），大小：{batch_size} 字节 [{report_type}]"
@@ -4162,7 +4197,9 @@ def send_to_ntfy(
 
         # 检查消息大小，确保不超过4KB
         if batch_size > 4096:
-            print(f"警告：ntfy第 {actual_batch_num} 批次消息过大（{batch_size} 字节），可能被拒绝")
+            print(
+                f"警告：ntfy第 {actual_batch_num} 批次消息过大（{batch_size} 字节），可能被拒绝"
+            )
 
         # 添加批次标识（使用正确的批次编号）
         current_headers = headers.copy()
@@ -4183,7 +4220,9 @@ def send_to_ntfy(
             )
 
             if response.status_code == 200:
-                print(f"ntfy第 {actual_batch_num}/{total_batches} 批次发送成功 [{report_type}]")
+                print(
+                    f"ntfy第 {actual_batch_num}/{total_batches} 批次发送成功 [{report_type}]"
+                )
                 success_count += 1
                 if idx < total_batches:
                     # 公共服务器建议 2-3 秒，自托管可以更短
@@ -4203,7 +4242,9 @@ def send_to_ntfy(
                     timeout=30,
                 )
                 if retry_response.status_code == 200:
-                    print(f"ntfy第 {actual_batch_num}/{total_batches} 批次重试成功 [{report_type}]")
+                    print(
+                        f"ntfy第 {actual_batch_num}/{total_batches} 批次重试成功 [{report_type}]"
+                    )
                     success_count += 1
                 else:
                     print(
@@ -4223,13 +4264,21 @@ def send_to_ntfy(
                     pass
 
         except requests.exceptions.ConnectTimeout:
-            print(f"ntfy第 {actual_batch_num}/{total_batches} 批次连接超时 [{report_type}]")
+            print(
+                f"ntfy第 {actual_batch_num}/{total_batches} 批次连接超时 [{report_type}]"
+            )
         except requests.exceptions.ReadTimeout:
-            print(f"ntfy第 {actual_batch_num}/{total_batches} 批次读取超时 [{report_type}]")
+            print(
+                f"ntfy第 {actual_batch_num}/{total_batches} 批次读取超时 [{report_type}]"
+            )
         except requests.exceptions.ConnectionError as e:
-            print(f"ntfy第 {actual_batch_num}/{total_batches} 批次连接错误 [{report_type}]：{e}")
+            print(
+                f"ntfy第 {actual_batch_num}/{total_batches} 批次连接错误 [{report_type}]：{e}"
+            )
         except Exception as e:
-            print(f"ntfy第 {actual_batch_num}/{total_batches} 批次发送异常 [{report_type}]：{e}")
+            print(
+                f"ntfy第 {actual_batch_num}/{total_batches} 批次发送异常 [{report_type}]：{e}"
+            )
 
     # 判断整体发送是否成功
     if success_count == total_batches:
